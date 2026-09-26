@@ -133,9 +133,9 @@ P&L includes fees and gas (median measured on each chain).
 
 ### PONS 16 days (Robinhood Chain)
 
-![PONS 16 days: price, TWAP and stopped periods](../backtest/results/pons16-price.svg)
+![PONS 16 days: price, TWAP and stopped periods](../backtest/results/pons-price.svg)
 
-![PONS 16 days: P&L over time](../backtest/results/pons16-pnl.svg)
+![PONS 16 days: P&L over time](../backtest/results/pons-pnl.svg)
 
 | | Fixed, 4 ranges | Re-center | Holster ±5%, 75% |
 |---|---:|---:|---:|

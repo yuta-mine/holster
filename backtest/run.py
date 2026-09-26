@@ -1,4 +1,4 @@
-"""Runs the PONS and NEAR backtests and writes results/results.md and the SVG charts.
+"""Runs the backtests and writes results/results.md and the SVG charts.
 
     python3 backtest/run.py
 """
@@ -24,11 +24,7 @@ DATASETS = [
          start=dt.datetime(2026, 8, 27, tzinfo=dt.timezone.utc), t0=0, t1=30 * 86400, width=0.05, value=1_000.0,
          pool_L=1.4293454154469753e20 * 1e-15, chains=['Ethereum', 'L2 (Base)'],
          bands=(0.03, 0.05, 0.10, 0.20)),
-    dict(key='pons', title='PONS/USDG, Uniswap v4 on Robinhood Chain, 7 days (dynamic fee)', file='pons.json',
-         start=dt.datetime(2026, 9, 18, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 7 * 86400, width=0.10,
-         value=10_000.0, pool_L=4.4745225847351430e19 * 1e-12, chains=['Robinhood Chain'],
-         bands=(0.03, 0.05, 0.10, 0.20)),
-    dict(key='pons16', title='PONS/USDG, Uniswap v4 on Robinhood Chain, 16 days (dynamic fee)', file='pons16.json',
+    dict(key='pons', title='PONS/USDG, Uniswap v4 on Robinhood Chain (dynamic fee)', file='pons.json',
          start=dt.datetime(2026, 9, 9, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 16 * 86400, width=0.10,
          value=10_000.0, pool_L=2.54684756045483e19 * 1e-12, chains=['Robinhood Chain'],
          bands=(0.03, 0.05, 0.10, 0.20)),
@@ -39,10 +35,6 @@ DATASETS = [
     dict(key='lit', title='LIT/USDC, Uniswap v4 on Ethereum (0.35%)', file='lit.json',
          start=dt.datetime(2026, 8, 26, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 30 * 86400, width=0.10,
          value=10_000.0, pool_L=6.982205008493984e17 * 1e-12, chains=['Ethereum', 'L2 (Base)'],
-         bands=(0.03, 0.05, 0.10, 0.20)),
-    dict(key='uni', title='UNI/USDT, Uniswap v3 on Ethereum (0.3%)', file='uni.json',
-         start=dt.datetime(2026, 8, 26, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 30 * 86400, width=0.10,
-         value=10_000.0, pool_L=1.071187005217419e18 * 1e-12, chains=['Ethereum', 'L2 (Base)'],
          bands=(0.03, 0.05, 0.10, 0.20)),
 ]
 CHART_BAND = 0.05  # Holster example shown in the charts: band ±5%, 75% deployed

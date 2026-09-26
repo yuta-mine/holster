@@ -133,9 +133,9 @@ swap単位で、LPのポジションを集中流動性の計算式で動かす�
 
 ### PONS 16日（Robinhood Chain）
 
-![PONS 16日: 価格・TWAP・止めた期間](../backtest/results/pons16-price.svg)
+![PONS 16日: 価格・TWAP・止めた期間](../backtest/results/pons-price.svg)
 
-![PONS 16日: 損益の推移](../backtest/results/pons16-pnl.svg)
+![PONS 16日: 損益の推移](../backtest/results/pons-pnl.svg)
 
 | | 固定（4段） | 張り直し | Holster ±5%・75% |
 |---|---:|---:|---:|
