@@ -1,4 +1,5 @@
-import { NETWORKS, DEFAULT_CHAIN_ID } from "./config.js";
+// Loaded fresh on every visit: the addresses change whenever the demo is set up again (init-demo.sh).
+const { NETWORKS, DEFAULT_CHAIN_ID } = await import(`./config.js?v=${Date.now()}`);
 
 const $ = (id) => document.getElementById(id);
 const net = NETWORKS[DEFAULT_CHAIN_ID];
@@ -61,8 +62,8 @@ const STATES = () => [
   {
     label: t("Back inside the band", "bandの中に戻る"), price: 1.0,
     holster: [["bid", 0.9, 1.0], ["ask", 1.0, 1.1]], recenter: [["filled", 1.0, 1.15], ["ask", 1.15, 1.265]],
-    text: t("Both sides return around 1.00. On the real v4 PoolManager: Holster +396 USDC, re-centering LP −227 USDC.",
-            "1.00の周りに両側が戻る。本物のv4 PoolManager上で、Holster +396 USDC、張り直すLP −227 USDC。"),
+    text: t("Both sides return around 1.00.",
+            "1.00の周りに両側が戻る。"),
   },
 ];
 const COLORS = { bid: "var(--bid)", ask: "var(--ask)", sold: "var(--muted)", filled: "var(--ask)", off: "var(--line)" };
@@ -103,57 +104,61 @@ function mountPositions(root) {
 const STEPS = () => [
   {
     tab: t("The problem", "課題"),
-    copy: t(`<h1>LPs keep quoting through a pump</h1>
-      <p>An attacker pumps a thin token. The LP re-centers around the new top, so a fresh bid sits right under it. Then the attacker dumps into that bid.</p>
-      <p>The LP buys high. Existing defenses raise fees or halt the whole pool; none lets an LP stop only its losing side.</p>`,
-      `<h1>LPはパンプの最中も流動性を出し続ける</h1>
-      <p>攻撃者が流動性の少ないトークンを買い上げる。LPは新しい高値の周りに置き直すので、高値の真下に買い側ができる。そこへ攻撃者が売り浴びせる。</p>
-      <p>LPは高値で買わされる。既存の対策は手数料を上げるかプール全体を止めるもので、LPが不利な側だけを止める仕組みはない。</p>`),
-    visual: `<div class="flow">
-        <div class="box bad"><div class="who">${t("Attacker", "攻撃者")}</div>${t("<b>Pumps</b> 1.00 → 1.15", "1.00 → 1.15に<b>買い上げる</b>")}</div>
-        <div class="arrow">↓</div>
-        <div class="box"><div class="who">${t("LP (re-centers)", "LP（張り直す）")}</div>${t("<b>Moves its bid</b> right under 1.15", "1.15の真下に<b>買い側を置き直す</b>")}</div>
-        <div class="arrow">↓</div>
-        <div class="box bad"><div class="who">${t("Attacker", "攻撃者")}</div>${t("<b>Dumps</b> back to 1.00 into that bid", "その買い側に<b>売り浴びせて</b>1.00へ")}</div>
+    copy: t(`<h1>Stay put, or re-center?</h1>
+      <p>A static LP loses nothing when the price comes back, but earns no fees out of range.</p>
+      <p>A re-centering LP keeps earning, but the bid it re-places at the top gets dumped on.</p>
+      <p><b>Is there a way to LP that beats both?</b></p>`,
+      `<h1>置いたままか、張り直すか</h1>
+      <p>置いたままのLPは、価格が戻れば損はないが、範囲外では手数料が入らない。</p>
+      <p>張り直し続けると手数料は取れるが、パンプの頂点で置き直した買い側に売り浴びせられる。</p>
+      <p><b>両方より良いLPの仕方はないか？</b></p>`),
+    visual: `<div class="two">
+        <div class="flow"><div class="box"><div class="who">${t("Static LP", "置いたままのLP")}</div>
+          <div class="num"><b>±0</b>${t("+ fees", "＋手数料")}</div>
+          ${t("No fees while out of range", "範囲外では手数料が入らない")}</div></div>
+        <div class="flow"><div class="box bad"><div class="who">${t("Re-centering LP", "張り直すLP")}</div>
+          <div class="num loss"><b>−1,115</b>USDC</div>
+          ${t("Re-places at the top and buys high", "頂点で置き直して、高値で買わされる")}</div></div>
       </div>
-      <div class="big"><b>−227 USDC</b>${t("for the re-centering LP in one round trip", "張り直すLPの、1往復での損益")}</div>`,
+      <p class="muted small">${t("Test on Uniswap v4: a $20,000 LP, one round trip 1.00 → 1.15 → 1.00.",
+        "Uniswap v4上のテスト。$20,000のLPで、1.00 → 1.15 → 1.00を1往復。")}</p>`,
   },
   {
     tab: t("The idea", "考え方"),
     copy: t(`<h1>Don't buy the pump. Don't sell the dump.</h1>
-      <p>Compare the price with a 30-minute TWAP recorded on-chain. The TWAP trails the price, so sudden moves land outside the band.</p>
+      <p>Holster compares the price with a 30-minute TWAP recorded on-chain. The TWAP trails the price, so sudden moves land outside the band.</p>
       <p><b style="color:var(--ask)">Above the band</b>: no bids. <b style="color:var(--bid)">Below</b>: no asks. Back inside: both sides return.</p>`,
       `<h1>パンプで買わない。ダンプで売らない。</h1>
-      <p>価格を、オンチェーンで記録した30分のTWAPと比べる。TWAPは価格に遅れてついてくるので、急な動きはbandの外に出る。</p>
+      <p>Holsterは、価格をオンチェーンで記録した30分のTWAPと比べる。TWAPは価格に遅れてついてくるので、急な動きはbandの外に出る。</p>
       <p><b style="color:var(--ask)">bandより上</b>では買わない。<b style="color:var(--bid)">下</b>では売らない。中に戻れば両側を戻す。</p>`),
     visual: `<img src="./assets/band.${lang}.svg" alt="TWAP band" />`,
   },
   {
     tab: t("How it reacts", "動き"),
     copy: t(`<h1>Pull the losing side before the next swap</h1>
-      <p>The LP holds a one-sided bid below the price and an ask above it. Right before every swap the hook checks the band and re-places the allowed sides next to the price.</p>`,
+      <p>The LP holds a one-sided bid below the price and an ask above it. Right before every swap the hook checks the band and re-places the allowed sides next to the price.</p>
+      <p>A re-centering LP puts its bid right under a spike. Holster doesn't.</p>`,
       `<h1>次のswapの前に、不利な側を引き上げる</h1>
-      <p>LPは、価格の下に買い側、上に売り側を、それぞれ片側だけのポジションで持つ。swapの直前に毎回hookがbandを確かめ、出してよい側を価格の隣に置き直す。</p>`),
+      <p>LPは、価格の下に買い側、上に売り側を、それぞれ片側だけのポジションで持つ。swapの直前に毎回hookがbandを確かめ、出してよい側を価格の隣に置き直す。</p>
+      <p>張り直すLPは急騰の真下に買い側を置き直すが、Holsterは置かない。</p>`),
     visual: `<div class="card"><div class="substeps"></div><div class="diagram"></div><div class="caption"></div></div>`,
     mount: (root) => mountPositions(root.querySelector(".card")),
   },
   {
     tab: t("How it's built", "実装"),
     copy: t(`<h1>One rule set, two venues</h1>
-      <p>The same band runs fully on-chain on Uniswap v4 and 1inch Aqua. No keeper is needed.</p>`,
+      <p>The same band runs fully on-chain on Uniswap v4 and 1inch Aqua. On v4 it runs inside every swap; a keeper is optional and only keeps the positions current between swaps.</p>`,
       `<h1>同じルールを、2つの場所で</h1>
-      <p>同じbandが、Uniswap v4と1inch Aquaの上ですべてオンチェーンで動く。keeperは不要。</p>`),
+      <p>同じbandが、Uniswap v4と1inch Aquaの上ですべてオンチェーンで動く。v4ではswapのたびに動き、keeperは任意（swapがない間もポジションを最新に保つだけ）。</p>`),
     visual: `<div class="two">
         <div class="dark"><h3>Uniswap v4 hook</h3><ul>
           <li>${t("Holds the LP's funds as two positions", "LPの資金を2つのポジションで持つ")}</li>
-          <li>${t("<code>beforeSwap</code>: check the band, re-place", "<code>beforeSwap</code>でbandを確認し置き直す")}</li>
-          <li>${t("Live on Base Sepolia", "Base Sepoliaで稼働中")}</li></ul></div>
+          <li>${t("<code>beforeSwap</code>: check the band, re-place", "<code>beforeSwap</code>でbandを確認し置き直す")}</li></ul></div>
         <div class="dark"><h3>1inch Aqua</h3><ul>
           <li>${t("One SwapVM <code>Extruction</code> prices every quote", "SwapVMの<code>Extruction</code>1つで見積もる")}</li>
           <li>${t("Funds stay in the maker's wallet", "資金はmakerのウォレットのまま")}</li>
           <li>${t("Re-placing costs no gas", "置き直しにガス代がかからない")}</li></ul></div>
-      </div>
-      <div class="big" style="margin-top:16px"><b>23</b>${t("Foundry tests on the real v4 PoolManager and Aqua", "本物のv4 PoolManagerとAqua上のFoundryテスト")}</div>`,
+      </div>`,
   },
   {
     tab: t("Backtest", "バックテスト"),
@@ -163,19 +168,27 @@ const STEPS = () => [
       <p>NEAR・PONS・BaseCat・LITのswapを、手数料とガス代込みで再生。Holsterは4つとも、張り直すLPを上回った。</p>`),
     visual: `<table class="res">
         <tr><th></th><th>NEAR 30d</th><th>PONS 16d</th><th>BaseCat 30d</th><th>LIT 30d</th></tr>
-        <tr><td>${t("Re-centering LP", "張り直すLP")}</td><td>+0.6%</td><td>−5.4%</td><td>+56.5%</td><td>−34.7%</td></tr>
-        <tr class="hl"><td>Holster</td><td>+71.0%</td><td>+4.6%</td><td>+75.3%</td><td>+24.5%</td></tr>
-        <tr><td class="muted">${t("Fixed ranges (hindsight)", "固定レンジ（後出し）")}</td><td class="muted">+51.6%</td><td class="muted">+13.5%</td><td class="muted">+67.3%</td><td class="muted">+26.9%</td></tr>
+        <tr class="hl"><td>Holster <span class="ver">v4 hook</span></td><td class="best">+71.0%</td><td>+4.6%</td><td class="best">+75.3%</td><td>+24.5%</td></tr>
+        <tr><td>${t("Re-centering LP", "張り直すLP")} <span class="ver">v3</span></td><td>+0.6%</td><td>−5.4%</td><td>+56.5%</td><td>−34.7%</td></tr>
+        <tr><td>${t("Fixed ranges (hindsight)", "固定レンジ（後出し）")} <span class="ver">v3</span></td><td>+51.6%</td><td class="best">+13.5%</td><td>+67.3%</td><td class="best">+26.9%</td></tr>
+        <tr><td>${t("Full range", "全価格帯")} <span class="ver">v2</span></td><td>+67.2%</td><td>+0.3%</td><td>+14.6%</td><td>+21.2%</td></tr>
       </table>
-      <img src="./assets/near-pnl.svg" alt="NEAR P&L" style="margin-top:14px" />`,
+      <ul class="muted small notes">
+        <li>${t("<b>Holster</b>: band ±5%, 75% deployed, width ±5% (NEAR) / ±10% (others).", "<b>Holster</b>: band ±5%、出す割合75%、幅±5%（NEAR）/±10%（ほか）。")}</li>
+        <li>${t("<b>Re-centering LP</b>: one range of the same width around the price, re-placed each time the price leaves it.", "<b>張り直すLP</b>: 価格の周りに同じ幅の範囲を1本置き、外れるたびに置き直す。")}</li>
+        <li>${t("<b>Fixed ranges</b>: the period's lowest-to-highest price split into 4 price bands, one position each, never moved. Needs the range in advance.", "<b>固定レンジ</b>: 期間中の最安値〜最高値を4つの価格帯に分け、それぞれに1本ずつ置いて動かさない。値幅を前もって知っている前提。")}</li>
+        <li>${t("<span class=\"best\">Red</span>: best in each column.", "<span class=\"best\">赤字</span>: 各列で最も良い成績。")}</li>
+      </ul>
+      <img src="./assets/near-pnl.svg" alt="NEAR P&L" style="margin-top:14px" />
+      <p class="muted small">${t("Example: P&L over time on NEAR 30d.", "例: NEAR 30日の損益の推移。")}</p>`,
   },
   {
     tab: t("Live demo", "ライブデモ"),
     copy: t(`<h1>Live on Base Sepolia</h1>
-      <p>Pump the price on the live page and watch the bid switch off. The TWAP catches up within minutes and both sides return.</p>
+      <p>Pump the price on the live page and watch the bid switch off. If the price stays, the TWAP catches up in about 20 minutes and the bid returns.</p>
       <p><button class="primary" onclick="location.hash='#live'">Open the live demo →</button></p>`,
       `<h1>Base Sepoliaで稼働中</h1>
-      <p>「Base Sepoliaで動かす」で価格を買い上げると、買い側が止まる。数分でTWAPが追いつき、両側が戻る。</p>
+      <p>「Base Sepoliaで動かす」で価格を買い上げると、買い側が止まる。価格がそのままなら、20分ほどでTWAPが追いつき、買い側が戻る。</p>
       <p><button class="primary" onclick="location.hash='#live'">ライブデモを開く →</button></p>`),
     visual: `<div class="dark"><h3>${t("Contracts on Base Sepolia", "Base Sepoliaのコントラクト")}</h3><ul class="mono" style="font-size:13px">
         ${[["HolsterHook", net.hook], ["PoolManager (Uniswap)", "0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408"], ["BASE", net.base], ["USDC", net.quote]]
@@ -186,12 +199,14 @@ const STEPS = () => [
   {
     tab: t("Open questions", "今後の課題"),
     copy: t(`<h1>What's next</h1>
-      <p>Holster rarely loses, but these need more work before production.</p>`,
+      <p>These need more work before production.</p>`,
       `<h1>今後の課題</h1>
-      <p>Holsterは負けにくいが、実用の前に詰めるべき点がある。</p>`),
+      <p>実用の前に、詰めるべき点がある。</p>`),
     visual: `<div class="flow">
         <div class="box"><div class="who">${t("Other LPs", "他のLP")}</div>${t("While a side is stopped, other LPs take those trades. If most of a pool used Holster, results could change.",
           "片側を止めている間の取引は他のLPが受ける。プールの多くがHolsterになると、結果は変わりうる。")}</div>
+        <div class="box"><div class="who">${t("Fixed ranges sometimes win", "固定レンジの方が良い場合")}</div>${t("To be honest, as we added backtests, several fixed concentrated ranges sometimes did better (PONS, LIT). Holster misses fee income while a side is stopped, and locks in losses each time it re-places in a ranging market. So combining Holster with fixed ranges is the next thing to test.",
+          "正直に言うと、バックテストを増やしてみると、固定の集中流動性を何本も置いた方が良い結果になるケースもあった（PONS、LIT）。Holsterは片側を止めている間の手数料収入を逃し、往復する相場では置き直すたびに損が確定する。なので、固定レンジと組み合わせる形を次に試したい。")}</div>
         <div class="box"><div class="who">${t("Deployed share", "出す割合")}</div>${t("Results depend a lot on how much is deployed. 75% balanced well, but it was not optimized.",
           "結果は出す割合で大きく変わる。75%がバランス良かったが、最適化はしていない。")}</div>
         <div class="box"><div class="who">${t("Gas", "ガス代")}</div>${t("Re-placing costs more gas than a plain LP. Small on L2; none on Aqua.",
