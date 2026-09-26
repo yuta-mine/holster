@@ -21,6 +21,15 @@ for (const id of chainIds) {
   console.log(`chain ${id}: hook ${d.hook}`);
 }
 
+// Band-off pool for the comparison: contracts/deployments/v4-baseline-<chainId>.json.
+for (const id of chainIds) {
+  const file = join(here, "..", "contracts", "deployments", `v4-baseline-${id}.json`);
+  if (!existsSync(file)) continue;
+  const d = JSON.parse(readFileSync(file, "utf8"));
+  config = config.replace(new RegExp(`(${id}: \\{[\\s\\S]*?baseline: )"[^"]*"`), `$1"${d.hook}"`);
+  console.log(`chain ${id}: baseline ${d.hook}`);
+}
+
 // Aqua strategy: rewrite the `aqua: { ... }` block of each chain from contracts/deployments/aqua-<chainId>.json.
 for (const id of chainIds) {
   const file = join(here, "..", "contracts", "deployments", `aqua-${id}.json`);

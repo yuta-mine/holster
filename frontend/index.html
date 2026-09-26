@@ -59,8 +59,8 @@
           <div class="mono" id="askRange">–</div>
         </div>
       </div>
-      <svg id="chart" viewBox="0 0 600 220" preserveAspectRatio="none" aria-label="price, TWAP and band"></svg>
-      <div class="legend"><span><i style="background:var(--ink)"></i><span data-ja="価格">price</span></span><span><i style="background:var(--band)"></i>TWAP</span><span><i style="background:var(--band);opacity:.3;height:8px"></i>band</span></div>
+      <div class="chartbox"><svg id="chart" aria-label="price, TWAP and band over the last hour"></svg><div id="chartTip" class="tip" hidden></div></div>
+      <div class="legend"><span><i style="background:var(--ink)"></i><span data-ja="価格">price</span></span><span><i style="background:var(--band)"></i>TWAP</span><span><i style="background:var(--band);opacity:.3;height:8px"></i>band</span><span><i style="background:var(--ask);opacity:.25;height:8px"></i><span data-ja="bandの外（片側を止める）">outside the band (one side stopped)</span></span><span class="muted" data-ja="直近15分">last 15 min</span></div>
       <div class="row market">
         <span class="muted" data-ja="価格を動かす:">Move the price:</span>
         <button id="pump" class="buy">Pump +15%</button>
