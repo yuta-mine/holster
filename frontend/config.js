@@ -7,12 +7,12 @@ export const NETWORKS = {
     explorer: "https://sepolia.basescan.org",
     multicall3: "0xcA11bde05977b3631167028862bE2a173976CA11",
     poolManager: "0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408",
-    hook: "0x52C5Fb4F185B587744638D65238868CD265090C0",
-    router: "0x362D5453883C586773AE2a2A38d9a340053EA039",
-    base: "0xa2171544a4BD059648167d9F596D593595C856Fa",
-    quote: "0xC83dCAe17E29CCCFE036dc6b3C47887C37fC707A",
+    hook: "0xdF1F53eC484e22Ebc273E3f28Fb81ACdb02Fd0c0",
+    router: "0xaB051b1838c2357B8CA4cBEFa51cd6C564BFa865",
+    base: "0x617C225e2C3dC4f3b1d21CcA4d34F531FE29810D",
+    quote: "0x6B72f6054191Fc938274E4657D40D6D0DcE33e16",
     // the same pool with the band off (script/DeployV4.s.sol): an LP that only re-places out of range
-    baseline: "0x572D08791734e9A2D0Cea94AaB90232c985bd0C0",
+    baseline: "0x54549d92227967FD0b63e6A2E21A7a7F5e2e90C0",
     aqua: {
       aqua: "0x759C97e32e893CDC8CB2A644f30D793A2B1402b6",
       router: "0x3de705D645996B10c59438E45FA59f8a8B27Afb2",
