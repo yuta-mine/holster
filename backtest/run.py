@@ -32,6 +32,18 @@ DATASETS = [
          start=dt.datetime(2026, 9, 9, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 16 * 86400, width=0.10,
          value=10_000.0, pool_L=2.54684756045483e19 * 1e-12, chains=['Robinhood Chain'],
          bands=(0.03, 0.05, 0.10, 0.20)),
+    dict(key='basecat', title='BaseCat/USDC, Uniswap v4 on Base (1%)', file='basecat.json',
+         start=dt.datetime(2026, 8, 26, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 30 * 86400, width=0.10,
+         value=10_000.0, pool_L=2.5092924228310543e18 * 1e-12, chains=['L2 (Base)'],
+         bands=(0.03, 0.05, 0.10, 0.20)),
+    dict(key='lit', title='LIT/USDC, Uniswap v4 on Ethereum (0.35%)', file='lit.json',
+         start=dt.datetime(2026, 8, 26, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 30 * 86400, width=0.10,
+         value=10_000.0, pool_L=6.982205008493984e17 * 1e-12, chains=['Ethereum', 'L2 (Base)'],
+         bands=(0.03, 0.05, 0.10, 0.20)),
+    dict(key='uni', title='UNI/USDT, Uniswap v3 on Ethereum (0.3%)', file='uni.json',
+         start=dt.datetime(2026, 8, 26, 23, 30, tzinfo=dt.timezone.utc), t0=1800, t1=1800 + 30 * 86400, width=0.10,
+         value=10_000.0, pool_L=1.071187005217419e18 * 1e-12, chains=['Ethereum', 'L2 (Base)'],
+         bands=(0.03, 0.05, 0.10, 0.20)),
 ]
 CHART_BAND = 0.05  # Holster example shown in the charts: band ±5%, 75% deployed
 CHART_DEPLOY = 0.75
