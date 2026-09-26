@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Holster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="icon" type="image/png" href="./assets/favicon.png" />
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <div class="brand"><img class="logo" src="./assets/mark.png" alt="" /> Holster <span class="sub" data-ja="AMMのLP向けTWAPバンド · Base Sepoliaで稼働中">TWAP band for AMM LPs · Base Sepolia live</span></div>
+    <nav>
+      <a href="#how" id="navStory" data-ja="仕組み">How it works</a>
+      <a href="#live" id="navSandbox" data-ja="Base Sepoliaで動かす">Live on Base Sepolia</a>
+    </nav>
+    <div class="acct"><button id="langToggle" class="ghost">日本語</button><span id="account" class="mono"></span><button id="connect" class="primary" data-ja="ウォレット接続">Connect wallet</button></div>
+  </div>
+</header>
+
+<!-- ============================================================ How it works -->
+<main id="story" class="wrap view">
+  <ol class="steps" id="stepTabs"></ol>
+  <div class="stage">
+    <div class="copy" id="stepCopy"></div>
+    <div class="visual" id="stepVisual"></div>
+  </div>
+  <div class="pager">
+    <button id="prev">← Prev</button>
+    <span class="muted" id="stepCount"></span>
+    <button id="next" class="primary">Next →</button>
+  </div>
+</main>
+
+<!-- ============================================================ Live on Base Sepolia -->
+<main id="sandbox" class="wrap view" hidden>
+  <div class="venue"><button id="venueV4" class="on">Uniswap v4</button><button id="venueAqua">1inch Aqua</button></div>
+  <p id="venueNote" class="muted small"></p>
+  <div id="config-notice" class="notice" hidden></div>
+  <div class="grid">
+    <section class="card">
+      <span class="tag">Live</span>
+      <h2 data-ja="プールとLPのポジション">Pool and LP positions</h2>
+      <div class="stats">
+        <div class="stat"><div class="k" data-ja="プールの価格">Pool price</div><div class="v" id="price">–</div></div>
+        <div class="stat"><div class="k">TWAP (30 × 1 min)</div><div class="v" id="twap">–</div></div>
+        <div class="stat band"><div class="k">Band ±5%</div><div class="v" id="band">–</div></div>
+      </div>
+      <div class="sides">
+        <div class="side bid" id="bidBox">
+          <div class="title"><span data-ja="買い側 · BASEを買う">Bid · buys BASE</span> <span id="bidBadge" class="badge">–</span></div>
+          <div class="mono" id="bidRange">–</div>
+        </div>
+        <div class="side ask" id="askBox">
+          <div class="title"><span data-ja="売り側 · BASEを売る">Ask · sells BASE</span> <span id="askBadge" class="badge">–</span></div>
+          <div class="mono" id="askRange">–</div>
+        </div>
+      </div>
+      <svg id="chart" viewBox="0 0 600 220" preserveAspectRatio="none" aria-label="price, TWAP and band"></svg>
+      <div class="legend"><span><i style="background:var(--ink)"></i><span data-ja="価格">price</span></span><span><i style="background:var(--band)"></i>TWAP</span><span><i style="background:var(--band);opacity:.3;height:8px"></i>band</span></div>
+      <div class="row market">
+        <span class="muted" data-ja="価格を動かす:">Move the price:</span>
+        <button id="pump" class="buy">Pump +15%</button>
+        <button id="dump" class="sell">Dump −13%</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <span class="tag">LP</span>
+      <h2 data-ja="流動性">Liquidity</h2>
+      <div class="kv"><span class="muted" data-ja="LPの保有">LP holds</span><span class="mono" id="lpTotal">–</span></div>
+      <div class="kv"><span class="muted" data-ja="プール内">In the pool</span><span class="mono" id="lpPool">–</span></div>
+      <div class="kv"><span class="muted" data-ja="手元に残した分">Reserve</span><span class="mono" id="lpReserve">–</span></div>
+      <div class="kv"><span class="muted" data-ja="幅 / 出す割合">Width / deployed</span><span class="mono" id="params">–</span></div>
+      <div id="ownerPanel" hidden>
+        <div id="v4Only">
+        <div class="row">
+          <input id="depBase" value="1000" /> <span class="muted">BASE</span>
+          <input id="depQuote" value="1000" /> <span class="muted">USDC</span>
+        </div>
+        <div class="row">
+          <button id="deposit" class="primary" data-ja="流動性を提供">Provide liquidity</button>
+          <button id="withdraw" data-ja="全部引き出す">Withdraw all</button>
+        </div>
+        </div>
+        <div class="row">
+          <span class="muted" data-ja="幅 ±">Width ±</span><input id="widthIn" value="10" style="width:64px" /><span class="muted">%</span>
+          <button id="setWidth" data-ja="幅を変更">Set width</button>
+        </div>
+      </div>
+      <p id="notOwner" class="muted small" data-ja="このデモのhookのLPは、デプロイしたアドレス1つだけ。そのウォレットで接続すると、流動性の提供・引き出し・幅の変更ができる。">This demo hook has a single LP: the address that deployed it. Connect with that wallet to provide liquidity, withdraw or change the width.</p>
+      <div id="log"></div>
+    </section>
+  </div>
+</main>
+
+<script type="module" src="./story.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
