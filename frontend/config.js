@@ -5,10 +5,14 @@ export const NETWORKS = {
     name: "Base Sepolia",
     rpc: "https://sepolia.base.org",
     explorer: "https://sepolia.basescan.org",
-    hook: "0x5DEA181AF0C7250e2CaA71cbC433dca7fB8990C0",
-    router: "0x307856d282b316762Ace0583721AF8c58e1d583e",
-    base: "0x5593082226286b0E613006aBd870B80F1cF26660",
-    quote: "0x9a9449f06e98289ad5Ca2Eb9d3B6941521c7BcA4",
+    multicall3: "0xcA11bde05977b3631167028862bE2a173976CA11",
+    poolManager: "0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408",
+    hook: "0x1565E63927c90248d077F6D832462D20773C10c0",
+    router: "0x6Dd11dcbABAB48FD45716af3400D981Ecb966406",
+    base: "0x5B7a39546a76D656c13e83834e78762eCb668E25",
+    quote: "0x6ba420ac953a7fb336459E88BFf14AF17F24D86d",
+    // the same pool with the band off (script/DeployV4.s.sol): an LP that only re-places out of range
+    baseline: "0xc74D05D7A1Ff478b39c0a78613fD60870eE910c0",
     aqua: {
       aqua: "0x759C97e32e893CDC8CB2A644f30D793A2B1402b6",
       router: "0x3de705D645996B10c59438E45FA59f8a8B27Afb2",
@@ -29,6 +33,7 @@ export const NETWORKS = {
     router: "",
     base: "",
     quote: "",
+    baseline: "",
   },
 };
 
