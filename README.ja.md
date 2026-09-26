@@ -215,15 +215,19 @@ export BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
 forge script script/DeployV4.s.sol   --rpc-url base_sepolia --account deployer --broadcast
 forge script script/DeployAqua.s.sol --rpc-url base_sepolia --account deployer --broadcast
 
-# パンプ&ダンプを流す（v4）
+# パンプ&ダンプを流す（v4。bandなしのプールにも同じ動きをかける）
 STEP=pump forge script script/DemoV4.s.sol --rpc-url base_sepolia --account deployer --broadcast
 STEP=dump forge script script/DemoV4.s.sol --rpc-url base_sepolia --account deployer --broadcast
+# 同じトークンでやり直す: 価格を1.00に戻し、10,000 BASE + 10,000 USDCを入れ直す（次のパンプはTWAPが追いつく30分後に）
+STEP=reset forge script script/DemoV4.s.sol --rpc-url base_sepolia --account deployer --broadcast
+# まっさらからやり直す: トークンとプールを新しく作り、フロントの設定も書き換える（リポジトリのルートで実行）
+../init-demo.sh
 # Aqua
 STEP=pump forge script script/DemoAqua.s.sol --rpc-url base_sepolia --account deployer --broadcast
 STEP=dump forge script script/DemoAqua.s.sol --rpc-url base_sepolia --account deployer --broadcast
 
-# 任意: keeper
-HOOK=<HolsterHookのアドレス> RPC_URL=$BASE_SEPOLIA_RPC_URL ACCOUNT=deployer ../keeper/poke.sh
+# 任意: keeper（deployments/の最新のデモ用プールを見る。HOOKS="0x.. 0x.."で指定もできる）
+INTERVAL=5 RPC_URL=$BASE_SEPOLIA_RPC_URL ACCOUNT=deployer ../keeper/poke.sh
 ```
 
 デプロイしたアドレスは`contracts/deployments/`に書き出される。パラメータは環境変数（`TWAP_CANDLES`、`WIDTH_BPS`、`UPPER_BPS`、`LOWER_BPS`、`DEPLOY_BPS`など）で変えられる。
@@ -233,7 +237,7 @@ HOOK=<HolsterHookのアドレス> RPC_URL=$BASE_SEPOLIA_RPC_URL ACCOUNT=deployer
 [`frontend/`](frontend)は、ビルドの要らない静的なページで、2つの画面がある（英語と日本語を切り替えられる）。
 
 - **仕組み（How it works）**: 課題 → 考え方 → 動き（パンプ&ダンプでの買い側・売り側の動きを図で切り替え）→ 実装 → バックテスト → ライブデモ → 今後の課題、の7ステップのスライド。
-- **Base Sepoliaで動かす（Live on Base Sepolia）**: Base Sepoliaにデプロイしたhookの価格・TWAP・band・買い側と売り側の状態・LPの残高を数秒ごとに表示する。パンプ（+15%）とダンプ（−13%）で価格を動かし、hookが不利な側を止める様子を確かめられる（テスト用トークンの受け取りとApproveは自動）。LP（hookをデプロイしたアドレス）で接続すると、流動性の提供・引き出し・幅の変更ができる。
+- **Base Sepoliaで動かす（Live on Base Sepolia）**: Base Sepoliaにデプロイしたhookの価格・TWAP・band・買い側と売り側の状態・LPの残高を数秒ごとに表示する。bandなしのプールをデプロイしていれば、2つのLPの損益（入れた資金をそのまま持っていた場合との差）を並べて表示する。パンプ（+15%）とダンプ（−13%）で価格を動かし、hookが不利な側を止める様子を確かめられる（テスト用トークンの受け取りとApproveは自動）。LP（hookをデプロイしたアドレス）で接続すると、流動性の提供・引き出し・幅の変更ができる。
 
 ```bash
 node frontend/sync-config.mjs      # contracts/deployments/ のアドレスを frontend/config.js に書き込む

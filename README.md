@@ -215,15 +215,19 @@ export BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
 forge script script/DeployV4.s.sol   --rpc-url base_sepolia --account deployer --broadcast
 forge script script/DeployAqua.s.sol --rpc-url base_sepolia --account deployer --broadcast
 
-# pump and dump (v4)
+# pump and dump (v4; the band-off pool gets the same moves)
 STEP=pump forge script script/DemoV4.s.sol --rpc-url base_sepolia --account deployer --broadcast
 STEP=dump forge script script/DemoV4.s.sol --rpc-url base_sepolia --account deployer --broadcast
+# start over with the same tokens: back to 1.00 with 10,000 BASE + 10,000 USDC (wait 30 min for the TWAP)
+STEP=reset forge script script/DemoV4.s.sol --rpc-url base_sepolia --account deployer --broadcast
+# or start over from scratch: new tokens and pools, and the frontend config updated (run at the repo root)
+../init-demo.sh
 # Aqua
 STEP=pump forge script script/DemoAqua.s.sol --rpc-url base_sepolia --account deployer --broadcast
 STEP=dump forge script script/DemoAqua.s.sol --rpc-url base_sepolia --account deployer --broadcast
 
-# optional: keeper
-HOOK=<HolsterHook address> RPC_URL=$BASE_SEPOLIA_RPC_URL ACCOUNT=deployer ../keeper/poke.sh
+# optional: keeper (watches the latest demo pools in deployments/; HOOKS="0x.. 0x.." to pick hooks)
+INTERVAL=5 RPC_URL=$BASE_SEPOLIA_RPC_URL ACCOUNT=deployer ../keeper/poke.sh
 ```
 
 Deployed addresses are written to `contracts/deployments/`. Parameters can be changed with environment variables (`TWAP_CANDLES`, `WIDTH_BPS`, `UPPER_BPS`, `LOWER_BPS`, `DEPLOY_BPS`, ...).
@@ -233,7 +237,7 @@ Deployed addresses are written to `contracts/deployments/`. Parameters can be ch
 [`frontend/`](frontend) is a static page with no build step and two views (English or Japanese).
 
 - **How it works**: seven slides: the problem → the idea → how it reacts (a pump and dump stepped through on a price axis) → how it's built → backtest → live demo → open questions.
-- **Live on Base Sepolia**: the hook deployed on Base Sepolia, live: price, TWAP, band, the state of the bid and ask, and the LP's holdings. Pump (+15%) or dump (−13%) the pool and watch the hook pull the losing side (test tokens and approvals are handled for you). Connected as the LP (the address that deployed the hook), you can also provide liquidity, withdraw and change the width.
+- **Live on Base Sepolia**: the hook deployed on Base Sepolia, live: price, TWAP, band, the state of the bid and ask, and the LP's holdings. When the band-off pool is deployed, both LPs' P&L against just holding the deposit is shown side by side. Pump (+15%) or dump (−13%) the pool and watch the hook pull the losing side (test tokens and approvals are handled for you). Connected as the LP (the address that deployed the hook), you can also provide liquidity, withdraw and change the width.
 
 ```bash
 node frontend/sync-config.mjs      # copies addresses from contracts/deployments/ into frontend/config.js
